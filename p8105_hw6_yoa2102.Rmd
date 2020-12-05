@@ -29,7 +29,7 @@ theme_set(theme_minimal() + theme(legend.position = "bottom"))
 ##### After reading in the data, create a `city_state` variable and binary variable indicating whether homicide is solved. Omit the following: Dallas,TX; Phoenix,AZ; Kansas City, MO; Tulsa, AL. Limit analysis to `victim_race` is `white` or `black` and only retain relevant variables. 
 ```{r homicide, message = FALSE}
 homicide_df = 
-  read_csv("homicide_data /homicide-data.csv", na = c("", "NA", "Unknown")) %>% 
+  read_csv("./homicide_data /homicide-data.csv", na = c("", "NA", "Unknown")) %>% 
   mutate(
     city_state = str_c(city, state, sep = ", "),
     victim_age = as.numeric(victim_age),
@@ -48,8 +48,9 @@ homicide_df =
 
 ```
 
-
-##### Use the `glm` function to fit a logistic regression for Baltimore, MD with resolved vs unresolved as the outcome and victim age, sex and race as predictors.Obtain the estimate and confidence interval of the adjusted odds ratio for solving homicides comparing non-white victims to white victims keeping all other variables fixed. 
+ &nbsp;
+ 
+##### Use the `glm` function to fit a logistic regression for Baltimore, MD with resolved vs unresolved as the outcome and victim age, sex and race as predictors. Obtain the estimate and confidence interval of the adjusted odds ratio for solving homicides comparing non-white victims to white victims keeping all other variables fixed. 
 
 ```{r}
 baltimore_df =
@@ -70,6 +71,8 @@ glm(resolution ~ victim_age + victim_race + victim_sex,
 ```
 In Baltimore, the odds of solving a non-White (Black) homicide victim's case is 0.431 times the odds of solving a White victim's homicide case (95% CI:0.306, 0.607).
 
+ &nbsp;
+ 
 ##### Run `glm` for each of the cities in your dataset, and extract the adjusted odds ratio (and CI) for solving homicides comparing Black victims to white victims.
 
 ```{r}
@@ -92,7 +95,8 @@ models_results_df =
   select(city_state, term, OR, starts_with("CI")) 
 ```
 
-
+ &nbsp;
+ 
 ##### Create a plot that shows the estimated ORs and CIs for each city and be sure to organize cities by estimated OR.
 ```{r}
 models_results_df %>% 
@@ -112,3 +116,34 @@ models_results_df %>%
 From the plot above, we observe that Tampa, Birmingham, Long Beach, and Durham reported the highest odds ratio estimates (all exceeding the null value of 1). In these cities, homicides involving non-Whites were more likely to be resolved than homicides involving Whites. However, it is important to note that the confidence intervals for the odds ratios above contain the null value of 1, meaning that these results are NOT statistically significant. 
 
 Conversely, Boston, Omaha, and Oakland report the lowest odds ratio estimates (all below the null value of 1). In these cities, homicides involving non-Whites were less likely to be resolved than homicides involving Whites. These results are statistically significant, as the confidence intervals for the ORs in the above-mentioned cities do NOT contain the null value of 1. 
+
+ &nbsp;
+ 
+ &nbsp;
+
+### Problem 2
+
+##### Load and clean birthweight data for regression analysis (i.e. convert numeric to factor where appropriate, check for missing data, etc.).
+
+```{r, message = FALSE}
+birth_df = 
+  read_csv("./birth_data/birthweight.csv")
+
+anyNA(birth_df)
+
+birth_df = birth_df %>%
+  mutate(
+    babysex = factor(babysex, levels = c(1, 2), labels = c("male", "female")),
+    frace = factor(frace, levels = c(1, 2, 3, 4, 8, 9),
+                      labels = c("white", "black", "asian", "puerto rican", "other",                                  "unknown")),
+    mrace = factor(mrace, levels = c(1, 2, 3, 4, 8, 9),                                                    labels = c("white","black", "asian", "puerto rican", "other",                                   "unknown")), 
+    malform = factor(malform, levels = c(0, 1), labels = c("absent", "present"))
+  ) 
+```
+After loading the data, there did not appear to be any missing data. Categorical variables (babysex, frace, malform, and mrace) were converted from numeric to factor variables. Additionally, appropriate labels were added to the aforementioned variables.
+
+ &nbsp;
+
+##### Propose a regression model for birthweight. 
+
+
