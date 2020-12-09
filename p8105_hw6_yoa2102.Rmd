@@ -147,7 +147,16 @@ After loading the data, there did not appear to be any missing data. Categorical
 ##### Propose a regression model for birthweight. 
 
 
-The literature suggests that socioeconomic predictors may be associated with low birthweight in babies. I hypothesize that number of cigarettes smoked per day, mother's race, family income will be significantly associated with birthweight. 
+The literature suggests that socioeconomic predictors and gestational age may be associated with low birthweight in babies. I hypothesize that number of cigarettes smoked per day, gestational age, mother's race, family income will be significantly associated with birthweight. 
+
+First, I will assess if each individual predictor is significantly associated with the outcome birthweight. 
+
+```{r}
+predicted_model = birth_df %>%
+  select(bwt, smoken, gaweeks, mrace, fincome) %>%
+  mutate(mrace = fct_infreq(mrace))
+```
+
 
  &nbsp;
  
