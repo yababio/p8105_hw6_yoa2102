@@ -147,16 +147,98 @@ After loading the data, there did not appear to be any missing data. Categorical
 ##### Propose a regression model for birthweight. 
 
 
-The literature suggests that socioeconomic predictors and gestational age may be associated with low birthweight in babies. I hypothesize that number of cigarettes smoked per day, gestational age, mother's race, family income will be significantly associated with birthweight. 
+The literature suggests that socioeconomic predictors, mother's behavior, and gestational age may be associated with low birthweight in babies. I hypothesize that number of cigarettes smoked per day, gestational age, mother's race, family income will be significantly associated with birthweight. 
 
-First, I will assess if each individual predictor is significantly associated with the outcome birthweight. 
+First, I will assess if each individual predictor is significantly associated with the outcome birthweight. Variables that are significantly associated with the outcome birthweight at p <0.20 will be included in the final hypothesized model.
 
 ```{r}
-predicted_model = birth_df %>%
+#Selecting relevant variables
+hypothesized_model = birth_df %>%
   select(bwt, smoken, gaweeks, mrace, fincome) %>%
   mutate(mrace = fct_infreq(mrace))
 ```
 
+ &nbsp;
+ 
+##### Smoking (`smoken`) and Birthweight (`bwt`) Bivariate Analysis
+```{r}
+smoken_bwt_model = lm(bwt ~smoken, data = hypothesized_model) %>%
+  broom::tidy() %>%
+  select(term, estimate, p.value)
+
+smoken_bwt_model %>%
+  knitr::kable(digits = 3)
+```
+The p-value is < 0.20 for the `smoken` variable. Smoking will be included in the final hypothesized model.
+
+&nbsp;
+
+##### Gestational Age (`gaweeks`) and Birthweight (`bwt`) Bivariate Analysis
+```{r}
+gaweeks_bwt_model = lm(bwt ~gaweeks, data = hypothesized_model) %>%
+  broom::tidy() %>%
+  select(term, estimate, p.value)
+
+gaweeks_bwt_model %>%
+  knitr::kable(digits = 3)
+```
+The p-value is < 0.20 at all levels of `gaweeks`. Gestational age will be included in the final hypothesized model.
+
+ &nbsp;
+
+ 
+##### Mother's Race (`mrace`) and Birthweight (`bwt`) Bivariate Analysis
+```{r}
+mrace_bwt_model = lm(bwt ~mrace, data = hypothesized_model) %>%
+  broom::tidy() %>%
+  select(term, estimate, p.value)
+
+mrace_bwt_model %>%
+  knitr::kable(digits = 3)
+```
+The p-value is < 0.20 at all levels of `mrace`. Mother's race will be included in the final hypothesized model.
+
+ &nbsp;
+
+##### Family Income (`fincome`) and Birthweight (`bwt`) Bivariate Analysis
+```{r}
+fincome_bwt_model = lm(bwt ~fincome, data = hypothesized_model) %>%
+  broom::tidy() %>%
+  select(term, estimate, p.value)
+
+fincome_bwt_model %>%
+  knitr::kable(digits = 3)
+```
+The p-value is < 0.20 for the variable `fincome`. Family monthly income will be included in the final hypothesized model.
+
+ &nbsp;
+ 
+Now, we can move forward fitting the entire hypothesized model.
+
+```{r}
+hyp_model = lm(bwt ~ smoken + gaweeks +  mrace + fincome, data = hypothesized_model)
+
+hyp_model %>%
+  broom::tidy() %>%
+  select(term, estimate, p.value) %>%
+  knitr::kable(digits = 3)
+```
+
+Family monthly income (`fincome`) is the only variable does not appear to be significant at the 5% level of significance. We can remove it from our hypothesized model.
+
+ &nbsp;
+
+##### Fitting our Hypothesized Model (Multivariate Analysis)
+```{r}
+hyp_model = lm(bwt ~ smoken + gaweeks +  mrace , data = hypothesized_model)
+
+hyp_model %>%
+  broom::tidy() %>%
+  select(term, estimate, p.value) %>%
+  knitr::kable(digits = 3)
+
+```
+All of the variables in our hypothesized model are now significant at a p-value < 0.05. 
 
  &nbsp;
  
