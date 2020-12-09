@@ -228,7 +228,7 @@ Family monthly income (`fincome`) is the only variable does not appear to be sig
 
  &nbsp;
 
-##### Fitting our Hypothesized Model (Multivariate Analysis)
+##### Final Hypothesized Model (Multivariate Analysis)
 ```{r}
 hyp_model = lm(bwt ~ smoken + gaweeks +  mrace , data = hypothesized_model)
 
@@ -239,6 +239,22 @@ hyp_model %>%
 
 ```
 All of the variables in our hypothesized model are now significant at a p-value < 0.05. 
+
+
+##### Plotting Model Residuals against Fitted Values
+```{r}
+plot_hyp = hypothesized_model %>%
+  modelr::add_residuals(hyp_model) %>%
+  modelr::add_predictions(hyp_model)
+
+plot_hyp %>%
+  ggplot(aes(x = pred, y = resid)) +
+  geom_point() +
+  labs( title = "Residuals against Fitted Values-- Hypothesized Model"
+    ) +
+  theme(plot.title = element_text(hjust = 0.5))
+  
+```
 
  &nbsp;
  
