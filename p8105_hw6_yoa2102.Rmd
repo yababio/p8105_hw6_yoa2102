@@ -147,3 +147,79 @@ After loading the data, there did not appear to be any missing data. Categorical
 ##### Propose a regression model for birthweight. 
 
 
+The literature suggests that socioeconomic predictors may be associated with low birthweight in babies. I hypothesize that number of cigarettes smoked per day, mother's race, family income will be significantly associated with birthweight. 
+
+ &nbsp;
+ 
+ &nbsp;
+
+### Problem 3
+
+##### Download 2017 Central Park Weather dataset.
+```{r}
+weather_df = 
+  rnoaa::meteo_pull_monitors(
+    c("USW00094728"),
+    var = c("PRCP", "TMIN", "TMAX"), 
+    date_min = "2017-01-01",
+    date_max = "2017-12-31") %>%
+  mutate(
+    name = recode(id, USW00094728 = "CentralPark_NY"),
+    tmin = tmin / 10,
+    tmax = tmax / 10) %>%
+  select(name, id, everything())
+```
+
+ &nbsp;
+
+###### Use 5000 bootstrap samples and, for each bootstrap sample, produce estimates R-squared and  log(β̂ 0∗β̂ 1)
+```{r}
+#writing function
+boot_sample = function(df) {
+  sample_frac(df, replace = TRUE)
+}
+
+#generating 5000 samples    
+boot_straps = 
+  tibble(
+    strap_number = 1:5000,
+    strap_sample = rerun(5000, boot_sample(weather_df))
+  )
+```
+
+
+```{r}
+#Producing R-squared estimates
+
+results_rsq = boot_straps %>%
+  mutate(
+    models = map(strap_sample, ~lm(tmax ~ tmin, data = .x)),
+    results = map(models, broom::glance)
+        ) %>%
+  select(-models, -strap_sample) %>%
+  unnest(cols = c(results))
+
+
+summarize(
+  results_rsq,
+  mean = mean(r.squared),
+  std_error = sd(r.squared)
+  ) %>%
+  knitr::kable()
+
+
+  
+```
+
+ &nbsp;
+
+###### 1) R-squared Plot
+```{r}
+results_rsq %>%
+  ggplot(aes(x = r.squared)) +
+  geom_density() +
+  labs( title = "Distribution of R-squared Values") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+
