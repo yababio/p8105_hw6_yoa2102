@@ -200,12 +200,6 @@ results_rsq = boot_straps %>%
   unnest(cols = c(results))
 
 
-summarize(
-  results_rsq,
-  mean = mean(r.squared),
-  std_error = sd(r.squared)
-  ) %>%
-  knitr::kable()
 
 
   
@@ -215,11 +209,69 @@ summarize(
 
 ###### 1) R-squared Plot
 ```{r}
+
+#mean and standard deviation
+summarize(
+  results_rsq,
+  mean = mean(r.squared),
+  median = median(r.squared)
+  ) %>%
+  knitr::kable(digits = 3)
+
+#rsquared plot
 results_rsq %>%
   ggplot(aes(x = r.squared)) +
   geom_density() +
   labs( title = "Distribution of R-squared Values") +
   theme(plot.title = element_text(hjust = 0.5))
 ```
+
+The distribution of the R-squared plot appears to be slightly left skewed (most of the outliers of this data exist at lower r-squared values). This is confirmed by the information above (mean < median). 
+
+ &nbsp;
+
+##### 2) Log(B0*B1) Plot
+```{r}
+
+#Producing log(B0*B1) estimates
+results_log = boot_straps %>%
+  mutate(
+    models = map(strap_sample, ~lm(tmax ~tmin, data =.x)),
+    results = map(models, broom::tidy)
+    ) %>%
+  select(-models, -strap_sample) %>%
+  unnest(cols = c(results)) %>%
+  select(term, strap_number, estimate) %>%
+  pivot_wider(
+    names_from = "term",
+    values_from = "estimate"
+  ) %>%
+  janitor::clean_names() %>%
+  mutate(
+    log = log(intercept*tmin)
+  )
+
+
+
+```
+
+```{r}
+#mean and standard deviation
+summarize(
+  results_log,
+  mean = mean(log),
+  std_dev = sd(log)
+  ) %>%
+    knitr::kable(digits = 3)
+
+#log plot
+results_log %>%
+  ggplot(aes(x = log)) +
+  geom_density() +
+  labs( title = "Distribution of Log(B0*B1) Values") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+The distribution of the log(B0*B1) looks approximately normal, with the mean and standard deviation listed above.
 
 
