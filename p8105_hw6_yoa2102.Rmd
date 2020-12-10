@@ -258,6 +258,12 @@ plot_hyp %>%
 
  &nbsp;
  
+##### Compare your hypothesized model with two others:
+  * One using length at birth and gestational age as predictors (main effects only)
+  * One using head circumference, length, sex, and all interactions (including the three-way interaction) between these
+
+ &nbsp;
+ 
  &nbsp;
 
 ### Problem 3
